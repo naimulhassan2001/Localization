@@ -16,26 +16,23 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Locale _locale = const Locale("en");
-  bool language = false;
+  String language = "en";
+  bool switchStatus = false;
 
   getLanguage() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-
     setState(() {
-      language = pref.getBool("language") ?? false;
+      language = pref.getString("language") ?? 'en';
+      switchStatus = pref.getBool("switchStatus") ?? false;
     });
   }
 
-  setLanguage(bool value) async {
+  setLanguage(String value, bool switchStatus) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    pref.setBool("language", value);  }
-
-  setLocale(Locale locale) {
-    setState(() {
-      _locale = locale;
-    });
+    pref.setString("language", value);
+    pref.setBool("switchStatus", switchStatus);
   }
+
 
   @override
   void initState() {
@@ -49,7 +46,7 @@ class _MyAppState extends State<MyApp> {
     getLanguage();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      locale: language ? const Locale("bn") : const Locale('en'),
+      locale: Locale(language),
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -60,10 +57,7 @@ class _MyAppState extends State<MyApp> {
         Locale('en'), // English
         Locale('bn'), // Bangla
       ],
-      home: HomePage(
-          getLanguage: getLanguage,
-          setLanguage: setLanguage,
-          language: language),
+      home: HomePage(setLanguage: setLanguage, switchStatus: switchStatus, ),
     );
   }
 }
